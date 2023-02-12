@@ -20,10 +20,18 @@ async function createBooking(userId: number, roomId: number){
         }
     })
 }
+async function deleteBooking(bookingId:number){
+    await prisma.booking.delete({
+        where:{
+            id: bookingId
+        }
+    })
+}
 
 const bookingRepository = {
 findBooking,
-createBooking
+createBooking,
+deleteBooking
 }
 
 export default bookingRepository;

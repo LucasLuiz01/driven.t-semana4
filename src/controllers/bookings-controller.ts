@@ -3,6 +3,24 @@ import bookingService from "@/services/booking-service";
 import { Response } from "express";
 import httpStatus from "http-status";
 
+export async function putBookingController (req: AuthenticatedRequest, res: Response){
+  const { userId } = req;
+  const { roomId } = req.body;
+  const { bookingId } = req.params;
+  try {
+    const bookings = await bookingService.putBookingService(Number(userId),Number(roomId),Number(bookingId));
+    const bookingIds = {bookingId: bookings.id}
+    return res.status(httpStatus.OK).send(bookingIds);
+  } catch (error) {
+    if (error.name === "NotFoundError") {
+      return res.sendStatus(httpStatus.NOT_FOUND);
+    }
+    if (error.name === "forbiddenError") {
+      return res.sendStatus(httpStatus.FORBIDDEN);
+    }
+  }
+}
+
 export async function getBookingController (req: AuthenticatedRequest, res: Response){
     const { userId } = req;
     try {
@@ -12,7 +30,6 @@ export async function getBookingController (req: AuthenticatedRequest, res: Resp
       if (error.name === "NotFoundError") {
         return res.sendStatus(httpStatus.NOT_FOUND);
       }
-      return res.sendStatus(httpStatus.BAD_REQUEST);
     }
 }
 
@@ -37,6 +54,5 @@ export async function createBookingController(req: AuthenticatedRequest, res: Re
     if (error.name === "forbiddenError") {
       return res.sendStatus(httpStatus.FORBIDDEN);
     }
-    return res.sendStatus(httpStatus.FORBIDDEN);
   }
 }

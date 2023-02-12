@@ -4,7 +4,7 @@ import bookingRepository from "@/repositories/booking-repository";
 import roomRepository from "@/repositories/room-repository";
 import { forbiddenError } from "@/errors";
 
-export async function getBookingService (userId: number){
+async function getBookingService (userId: number){
 const findReserva = await bookingRepository.findBooking(userId);
 if(!findReserva){
     throw notFoundError();
@@ -12,8 +12,16 @@ if(!findReserva){
 console.log(findReserva)
 return findReserva;
 }
+async function putBookingService (userId: number, roomId: number, bookingId: number){
+    const findRoom = await roomRepository.findRom(roomId);
+    if(!findRoom) throw notFoundError();
+    if(findRoom.Booking.length >= findRoom.capacity) throw forbiddenError();
+    await bookingRepository.deleteBooking(bookingId);
+    const fazendoReserva = await bookingRepository.createBooking(userId, roomId);
+    return fazendoReserva
+ }
 
-export async function postBookingService(roomId: number, userId: number){
+async function postBookingService(roomId: number, userId: number){
     const roomIdExist = await roomRepository.findRom(roomId)
     if(!roomIdExist) {
         throw notFoundError()
@@ -26,7 +34,8 @@ export async function postBookingService(roomId: number, userId: number){
 
 const bookingService = {
     getBookingService,
-    postBookingService
+    postBookingService,
+    putBookingService
 };
 
 export default bookingService;
